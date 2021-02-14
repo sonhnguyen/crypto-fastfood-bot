@@ -111,151 +111,59 @@ router.post("/future-order", async (req, res) => {
     .toFixed(currencyInfo.quantityPrecision);
 
   try {
-    const marketBuyOrder =  await client.futuresMarketBuy(
+    const marketBuyOrder = await client.futuresMarketBuy(
+      `${message.symbol}USDT`,
+      quantity.toString()
+    );
+
+    let entryPrice;
+    let position_data = await client.futuresPositionRisk(),
+      markets = Object.keys(position_data);
+    for (let market of markets) {
+      let obj = position_data[market],
+        size = Number(obj.positionAmt);
+      if (size == 0) continue;
+      entryPrice = obj.entryPrice;
+    }
+    console.log(entryPrice);
+
+    const takeProfitPrice = new Decimal(entryPrice).mul(
+      1 + Number(process.env.TAKEPROFIT_PERCENT)
+    );
+    const stoplossPrice = new Decimal(entryPrice).mul(
+      1 - Number(process.env.STOPLOSS_PERCENT)
+    );
+
+    console.log(
+      await client.futuresSell(
         `${message.symbol}USDT`,
-        quantity.toString()
+        quantity.toString(),
+        takeProfitPrice.toFixed(currencyInfo.pricePrecision).toString(),
+        {
+          stopPrice: takeProfitPrice
+            .toFixed(currencyInfo.pricePrecision)
+            .toString(),
+          type: "TAKE_PROFIT",
+        }
       )
+    );
 
-    // let entryPrice;
-    // let position_data = await client.futuresPositionRisk(),
-    //   markets = Object.keys(position_data);
-    // for (let market of markets) {
-    //   let obj = position_data[market],
-    //     size = Number(obj.positionAmt);
-    //   if (size == 0) continue;
-    //   entryPrice = obj.entryPrice;
-    // }
-    // console.log(entryPrice);
-
-    // const takeProfitPrice = new Decimal(entryPrice).mul(
-    //   1 + process.env.TAKEPROFIT_PERCENT
-    // );
-    // const stoplossPrice = new Decimal(entryPrice).mul(
-    //   1 - process.env.STOPLOSS_PERCENT
-    // );
-
-    // const result = await client.futuresOrder(
-    //   "SELL",
-    //   `${message.symbol}USDT`,
-    //   quantity.toString(),
-    //   takeProfitPrice,
-    //   {
-    //     stopPrice: takeProfitPrice,
-    //     type: "TAKE_PROFIT",
-    //   }
-    // );
-
-    // console.log(result);
-    // await client.sell(`${message.symbol}USDT`, quantity.toString(), stoplossPrice, {
-    //   stopPrice: stoplossPrice,
-    //   type: "STOP_LOSS",
-    // });
-
-    // console.log(
-    //   await client.orderOco({
-    //     side: "SELL",
-    //     symbol: `${message.symbol}USDT`,
-    //     quantity: quantity.toFixed(5).toString(),
-    //     price: currentPrice,
-    //     stopPrice: currentPrice,
-    //   })
-    // );
-
-    // console.log(
-    //   await client.orderOco({
-    //     useServerTime: true,
-    //     symbol: `${message.symbol}USDT`,
-    //     side: "BUY",
-    //     type: "TAKE_PROFIT",
-    //     quantity: quantity.toString(),
-    //     stopPrice:
-    //   })
-    // );
+    console.log(
+      await client.futuresSell(
+        `${message.symbol}USDT`,
+        quantity.toString(),
+        stoplossPrice.toFixed(currencyInfo.pricePrecision).toString(),
+        {
+          stopPrice: stoplossPrice
+            .toFixed(currencyInfo.pricePrecision)
+            .toString(),
+          type: "STOP",
+        }
+      )
+    );
   } catch (error) {
     console.log(error);
   }
-
-  // binance_query_open_order = {
-  //   symbol: msg.symbol,
-  //   side: msg.side,
-  //   positionSide: msg.position,
-  //   type: "MARKET",
-  //   timeInForce: "GTE_GTC",
-  //   quantity: 1,
-  //   timestamp: Number(new Date()),
-  //   newOrderRespType: "RESULT",
-  // };
-  // var request = require("request");
-  // var options = {
-  //   method: "POST",
-  //   url:
-  //     "https://testnet.binancefuture.com/fapi/v1/order?" +
-  //     querystring.stringify(binance_query_open_order),
-  //   headers: {
-  //     "Content-Type": "application/json",
-  //     "X-MBX-APIKEY": "api-key",
-  //   },
-  // };
-  // request(options, function (error, response) {
-  //   if (error) throw new Error(error);
-  //   console.log(response.body);
-  // });
-
-  // // Create TP
-  // binance_query_tp = {
-  //   symbol: msg.symbol,
-  //   side: msg.side,
-  //   positionSide: msg.position,
-  //   type: "MARKET",
-  //   timeInForce: "GTE_GTC",
-  //   quantity: 1,
-  //   timestamp: Number(new Date()),
-  //   newOrderRespType: "RESULT",
-  // };
-  // var request = require("request");
-  // var options = {
-  //   method: "POST",
-  //   url:
-  //     "https://testnet.binancefuture.com/fapi/v1/order?" +
-  //     querystring.stringify(binance_query_tp),
-  //   headers: {
-  //     "Content-Type": "application/json",
-  //     "X-MBX-APIKEY": "api-key",
-  //   },
-  // };
-  // request(options, function (error, response) {
-  //   if (error) throw new Error(error);
-  //   console.log(response.body);
-  // });
-
-  // // Create SL
-  // binance_query_sl = {
-  //   symbol: msg.symbol,
-  //   side: msg.side,
-  //   positionSide: msg.position,
-  //   type: "MARKET",
-  //   timeInForce: "GTE_GTC",
-  //   quantity: 1,
-  //   timestamp: Number(new Date()),
-  //   newOrderRespType: "RESULT",
-  // };
-  // var request = require("request");
-  // var options = {
-  //   method: "POST",
-  //   url:
-  //     "https://testnet.binancefuture.com/fapi/v1/order?" +
-  //     querystring.stringify(binance_query_sl),
-  //   headers: {
-  //     "Content-Type": "application/json",
-  //     "X-MBX-APIKEY": "api-key",
-  //   },
-  // };
-  // request(options, function (error, response) {
-  //   if (error) throw new Error(error);
-  //   console.log(response.body);
-  // });
-  // res.end(result);
-
   res.end("yes");
 });
 
