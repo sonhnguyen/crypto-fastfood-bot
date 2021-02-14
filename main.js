@@ -156,6 +156,7 @@ router.post("/future-order", async (req, res) => {
     return;
   }
 
+  // await setupFutures(Object.keys(exchangeInfo));
   const currencyInfo = exchangeInfo[`${message.symbol}USDT`];
   const currentPrice = (await client.futuresMarkPrice(`${message.symbol}USDT`))
     .markPrice;
@@ -169,20 +170,25 @@ router.post("/future-order", async (req, res) => {
     .toFixed(currencyInfo.quantityPrecision);
 
   try {
-    console.log(await client.futuresMarketBuy(
-      `${message.symbol}USDT`,
-      quantity.toString()
-    ));
+    console.log(
+      await client.futuresMarketBuy(
+        `${message.symbol}USDT`,
+        quantity.toString()
+      )
+    );
     let entryPrice;
-    let position_data = await client.futuresPositionRisk(),
-      markets = Object.keys(position_data);
-    for (let market of markets) {
-      let obj = position_data[market],
-        size = Number(obj.positionAmt);
-      if (size == 0) continue;
-      entryPrice = obj.entryPrice;
+    let position_data = await client.futuresPositionRisk();
+    const positionData = position_data.filter(
+      (p) => p.symbol == `${message.symbol}USDT`
+    )[0];
+
+    const size = Number(positionData.positionAmt);
+    if (size == 0) {
+      console.log("no position found");
+      return;
     }
-    console.log(entryPrice);
+    entryPrice = positionData.entryPrice;
+
     const takeProfitPrice = new Decimal(entryPrice).mul(
       1 + Number(process.env.TAKEPROFIT_PERCENT)
     );
@@ -215,6 +221,9 @@ router.post("/future-order", async (req, res) => {
         }
       )
     );
+    console.log("entry:", entryPrice);
+    console.log("stoploss:", stoplossPrice);
+    console.log("takeProfit:", takeProfitPrice);
   } catch (error) {
     console.log(error);
   }
