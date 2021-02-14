@@ -1,0 +1,812 @@
+{
+    "BTCUSDT": {
+        "minQty": "0.001",
+        "maxQty": "1000",
+        "stepSize": "0.001",
+        "minPrice": "0.01",
+        "maxPrice": "1000000",
+        "quantityPrecision": 3,
+        "pricePrecision": 2
+    },
+    "ETHUSDT": {
+        "minQty": "0.001",
+        "maxQty": "10000",
+        "stepSize": "0.001",
+        "minPrice": "0.01",
+        "maxPrice": "100000",
+        "quantityPrecision": 3,
+        "pricePrecision": 2
+    },
+    "BCHUSDT": {
+        "minQty": "0.001",
+        "maxQty": "10000",
+        "stepSize": "0.001",
+        "minPrice": "0.01",
+        "maxPrice": "100000",
+        "quantityPrecision": 3,
+        "pricePrecision": 2
+    },
+    "XRPUSDT": {
+        "minQty": "0.1",
+        "maxQty": "1000000",
+        "stepSize": "0.1",
+        "minPrice": "0.0001",
+        "maxPrice": "100000",
+        "quantityPrecision": 1,
+        "pricePrecision": 4
+    },
+    "EOSUSDT": {
+        "minQty": "0.1",
+        "maxQty": "1000000",
+        "stepSize": "0.1",
+        "minPrice": "0.001",
+        "maxPrice": "100000",
+        "quantityPrecision": 1,
+        "pricePrecision": 3
+    },
+    "LTCUSDT": {
+        "minQty": "0.001",
+        "maxQty": "10000",
+        "stepSize": "0.001",
+        "minPrice": "0.01",
+        "maxPrice": "100000",
+        "quantityPrecision": 3,
+        "pricePrecision": 2
+    },
+    "TRXUSDT": {
+        "minQty": "1",
+        "maxQty": "10000000",
+        "stepSize": "1",
+        "minPrice": "0.00001",
+        "maxPrice": "100000",
+        "quantityPrecision": 0,
+        "pricePrecision": 5
+    },
+    "ETCUSDT": {
+        "minQty": "0.01",
+        "maxQty": "100000",
+        "stepSize": "0.01",
+        "minPrice": "0.001",
+        "maxPrice": "100000",
+        "quantityPrecision": 2,
+        "pricePrecision": 3
+    },
+    "LINKUSDT": {
+        "minQty": "0.01",
+        "maxQty": "100000",
+        "stepSize": "0.01",
+        "minPrice": "0.001",
+        "maxPrice": "100000",
+        "quantityPrecision": 2,
+        "pricePrecision": 3
+    },
+    "XLMUSDT": {
+        "minQty": "1",
+        "maxQty": "10000000",
+        "stepSize": "1",
+        "minPrice": "0.00001",
+        "maxPrice": "100000",
+        "quantityPrecision": 0,
+        "pricePrecision": 5
+    },
+    "ADAUSDT": {
+        "minQty": "1",
+        "maxQty": "10000000",
+        "stepSize": "1",
+        "minPrice": "0.00001",
+        "maxPrice": "100000",
+        "quantityPrecision": 0,
+        "pricePrecision": 5
+    },
+    "XMRUSDT": {
+        "minQty": "0.001",
+        "maxQty": "10000",
+        "stepSize": "0.001",
+        "minPrice": "0.01",
+        "maxPrice": "100000",
+        "quantityPrecision": 3,
+        "pricePrecision": 2
+    },
+    "DASHUSDT": {
+        "minQty": "0.001",
+        "maxQty": "10000",
+        "stepSize": "0.001",
+        "minPrice": "0.01",
+        "maxPrice": "100000",
+        "quantityPrecision": 3,
+        "pricePrecision": 2
+    },
+    "ZECUSDT": {
+        "minQty": "0.001",
+        "maxQty": "10000",
+        "stepSize": "0.001",
+        "minPrice": "0.01",
+        "maxPrice": "100000",
+        "quantityPrecision": 3,
+        "pricePrecision": 2
+    },
+    "XTZUSDT": {
+        "minQty": "0.1",
+        "maxQty": "1000000",
+        "stepSize": "0.1",
+        "minPrice": "0.001",
+        "maxPrice": "100000",
+        "quantityPrecision": 1,
+        "pricePrecision": 3
+    },
+    "BNBUSDT": {
+        "minQty": "0.01",
+        "maxQty": "100000",
+        "stepSize": "0.01",
+        "minPrice": "0.001",
+        "maxPrice": "100000",
+        "quantityPrecision": 2,
+        "pricePrecision": 3
+    },
+    "ATOMUSDT": {
+        "minQty": "0.01",
+        "maxQty": "100000",
+        "stepSize": "0.01",
+        "minPrice": "0.001",
+        "maxPrice": "100000",
+        "quantityPrecision": 2,
+        "pricePrecision": 3
+    },
+    "ONTUSDT": {
+        "minQty": "0.1",
+        "maxQty": "1000000",
+        "stepSize": "0.1",
+        "minPrice": "0.0001",
+        "maxPrice": "100000",
+        "quantityPrecision": 1,
+        "pricePrecision": 4
+    },
+    "IOTAUSDT": {
+        "minQty": "0.1",
+        "maxQty": "1000000",
+        "stepSize": "0.1",
+        "minPrice": "0.0001",
+        "maxPrice": "100000",
+        "quantityPrecision": 1,
+        "pricePrecision": 4
+    },
+    "BATUSDT": {
+        "minQty": "0.1",
+        "maxQty": "1000000",
+        "stepSize": "0.1",
+        "minPrice": "0.0001",
+        "maxPrice": "100000",
+        "quantityPrecision": 1,
+        "pricePrecision": 4
+    },
+    "VETUSDT": {
+        "minQty": "1",
+        "maxQty": "10000000",
+        "stepSize": "1",
+        "minPrice": "0.000001",
+        "maxPrice": "100000",
+        "quantityPrecision": 0,
+        "pricePrecision": 6
+    },
+    "NEOUSDT": {
+        "minQty": "0.01",
+        "maxQty": "100000",
+        "stepSize": "0.01",
+        "minPrice": "0.001",
+        "maxPrice": "100000",
+        "quantityPrecision": 2,
+        "pricePrecision": 3
+    },
+    "QTUMUSDT": {
+        "minQty": "0.1",
+        "maxQty": "1000000",
+        "stepSize": "0.1",
+        "minPrice": "0.001",
+        "maxPrice": "100000",
+        "quantityPrecision": 1,
+        "pricePrecision": 3
+    },
+    "IOSTUSDT": {
+        "minQty": "1",
+        "maxQty": "10000000",
+        "stepSize": "1",
+        "minPrice": "0.000001",
+        "maxPrice": "100000",
+        "quantityPrecision": 0,
+        "pricePrecision": 6
+    },
+    "THETAUSDT": {
+        "minQty": "0.1",
+        "maxQty": "1000000",
+        "stepSize": "0.1",
+        "minPrice": "0.0001",
+        "maxPrice": "1000",
+        "quantityPrecision": 1,
+        "pricePrecision": 4
+    },
+    "ALGOUSDT": {
+        "minQty": "0.1",
+        "maxQty": "1000000",
+        "stepSize": "0.1",
+        "minPrice": "0.0001",
+        "maxPrice": "1000",
+        "quantityPrecision": 1,
+        "pricePrecision": 4
+    },
+    "ZILUSDT": {
+        "minQty": "1",
+        "maxQty": "10000000",
+        "stepSize": "1",
+        "minPrice": "0.00001",
+        "maxPrice": "100",
+        "quantityPrecision": 0,
+        "pricePrecision": 5
+    },
+    "KNCUSDT": {
+        "minQty": "1",
+        "maxQty": "10000000",
+        "stepSize": "1",
+        "minPrice": "0.00001",
+        "maxPrice": "100",
+        "quantityPrecision": 0,
+        "pricePrecision": 5
+    },
+    "ZRXUSDT": {
+        "minQty": "0.1",
+        "maxQty": "1000000",
+        "stepSize": "0.1",
+        "minPrice": "0.0001",
+        "maxPrice": "1000",
+        "quantityPrecision": 1,
+        "pricePrecision": 4
+    },
+    "COMPUSDT": {
+        "minQty": "0.001",
+        "maxQty": "10000",
+        "stepSize": "0.001",
+        "minPrice": "0.01",
+        "maxPrice": "100000",
+        "quantityPrecision": 3,
+        "pricePrecision": 2
+    },
+    "OMGUSDT": {
+        "minQty": "0.1",
+        "maxQty": "1000000",
+        "stepSize": "0.1",
+        "minPrice": "0.0001",
+        "maxPrice": "1000",
+        "quantityPrecision": 1,
+        "pricePrecision": 4
+    },
+    "DOGEUSDT": {
+        "minQty": "1",
+        "maxQty": "10000000",
+        "stepSize": "1",
+        "minPrice": "0.000001",
+        "maxPrice": "10",
+        "quantityPrecision": 0,
+        "pricePrecision": 6
+    },
+    "SXPUSDT": {
+        "minQty": "0.1",
+        "maxQty": "1000000",
+        "stepSize": "0.1",
+        "minPrice": "0.0001",
+        "maxPrice": "1000",
+        "quantityPrecision": 1,
+        "pricePrecision": 4
+    },
+    "KAVAUSDT": {
+        "minQty": "0.1",
+        "maxQty": "1000000",
+        "stepSize": "0.1",
+        "minPrice": "0.0001",
+        "maxPrice": "200",
+        "quantityPrecision": 1,
+        "pricePrecision": 4
+    },
+    "BANDUSDT": {
+        "minQty": "0.1",
+        "maxQty": "1000000",
+        "stepSize": "0.1",
+        "minPrice": "0.0001",
+        "maxPrice": "500",
+        "quantityPrecision": 1,
+        "pricePrecision": 4
+    },
+    "RLCUSDT": {
+        "minQty": "0.1",
+        "maxQty": "1000000",
+        "stepSize": "0.1",
+        "minPrice": "0.0001",
+        "maxPrice": "200",
+        "quantityPrecision": 1,
+        "pricePrecision": 4
+    },
+    "WAVESUSDT": {
+        "minQty": "0.1",
+        "maxQty": "1000000",
+        "stepSize": "0.1",
+        "minPrice": "0.0001",
+        "maxPrice": "200",
+        "quantityPrecision": 1,
+        "pricePrecision": 4
+    },
+    "MKRUSDT": {
+        "minQty": "0.001",
+        "maxQty": "10000",
+        "stepSize": "0.001",
+        "minPrice": "0.01",
+        "maxPrice": "50000",
+        "quantityPrecision": 3,
+        "pricePrecision": 2
+    },
+    "SNXUSDT": {
+        "minQty": "0.1",
+        "maxQty": "1000000",
+        "stepSize": "0.1",
+        "minPrice": "0.001",
+        "maxPrice": "1000",
+        "quantityPrecision": 1,
+        "pricePrecision": 3
+    },
+    "DOTUSDT": {
+        "minQty": "0.1",
+        "maxQty": "1000000",
+        "stepSize": "0.1",
+        "minPrice": "0.001",
+        "maxPrice": "500",
+        "quantityPrecision": 1,
+        "pricePrecision": 3
+    },
+    "DEFIUSDT": {
+        "minQty": "0.001",
+        "maxQty": "10000",
+        "stepSize": "0.001",
+        "minPrice": "0.1",
+        "maxPrice": "100000",
+        "quantityPrecision": 3,
+        "pricePrecision": 1
+    },
+    "YFIUSDT": {
+        "minQty": "0.001",
+        "maxQty": "500",
+        "stepSize": "0.001",
+        "minPrice": "0.1",
+        "maxPrice": "500000",
+        "quantityPrecision": 3,
+        "pricePrecision": 1
+    },
+    "BALUSDT": {
+        "minQty": "0.1",
+        "maxQty": "1000000",
+        "stepSize": "0.1",
+        "minPrice": "0.001",
+        "maxPrice": "5000",
+        "quantityPrecision": 1,
+        "pricePrecision": 3
+    },
+    "CRVUSDT": {
+        "minQty": "0.1",
+        "maxQty": "1000000",
+        "stepSize": "0.1",
+        "minPrice": "0.001",
+        "maxPrice": "1000",
+        "quantityPrecision": 1,
+        "pricePrecision": 3
+    },
+    "TRBUSDT": {
+        "minQty": "0.1",
+        "maxQty": "1000000",
+        "stepSize": "0.1",
+        "minPrice": "0.001",
+        "maxPrice": "4000",
+        "quantityPrecision": 1,
+        "pricePrecision": 3
+    },
+    "YFIIUSDT": {
+        "minQty": "0.001",
+        "maxQty": "500",
+        "stepSize": "0.001",
+        "minPrice": "0.1",
+        "maxPrice": "300000",
+        "quantityPrecision": 3,
+        "pricePrecision": 1
+    },
+    "RUNEUSDT": {
+        "minQty": "1",
+        "maxQty": "10000000",
+        "stepSize": "1",
+        "minPrice": "0.0001",
+        "maxPrice": "200",
+        "quantityPrecision": 0,
+        "pricePrecision": 4
+    },
+    "SUSHIUSDT": {
+        "minQty": "1",
+        "maxQty": "10000000",
+        "stepSize": "1",
+        "minPrice": "0.0001",
+        "maxPrice": "500",
+        "quantityPrecision": 0,
+        "pricePrecision": 4
+    },
+    "SRMUSDT": {
+        "minQty": "1",
+        "maxQty": "10000000",
+        "stepSize": "1",
+        "minPrice": "0.0001",
+        "maxPrice": "300",
+        "quantityPrecision": 0,
+        "pricePrecision": 4
+    },
+    "BZRXUSDT": {
+        "minQty": "1",
+        "maxQty": "10000000",
+        "stepSize": "1",
+        "minPrice": "0.0001",
+        "maxPrice": "100",
+        "quantityPrecision": 0,
+        "pricePrecision": 4
+    },
+    "EGLDUSDT": {
+        "minQty": "0.1",
+        "maxQty": "1000000",
+        "stepSize": "0.1",
+        "minPrice": "0.001",
+        "maxPrice": "2000",
+        "quantityPrecision": 1,
+        "pricePrecision": 3
+    },
+    "SOLUSDT": {
+        "minQty": "1",
+        "maxQty": "10000000",
+        "stepSize": "1",
+        "minPrice": "0.0001",
+        "maxPrice": "400",
+        "quantityPrecision": 0,
+        "pricePrecision": 4
+    },
+    "ICXUSDT": {
+        "minQty": "1",
+        "maxQty": "10000000",
+        "stepSize": "1",
+        "minPrice": "0.0001",
+        "maxPrice": "400",
+        "quantityPrecision": 0,
+        "pricePrecision": 4
+    },
+    "STORJUSDT": {
+        "minQty": "1",
+        "maxQty": "10000000",
+        "stepSize": "1",
+        "minPrice": "0.0001",
+        "maxPrice": "100",
+        "quantityPrecision": 0,
+        "pricePrecision": 4
+    },
+    "BLZUSDT": {
+        "minQty": "1",
+        "maxQty": "10000000",
+        "stepSize": "1",
+        "minPrice": "0.00001",
+        "maxPrice": "20",
+        "quantityPrecision": 0,
+        "pricePrecision": 5
+    },
+    "UNIUSDT": {
+        "minQty": "1",
+        "maxQty": "10000000",
+        "stepSize": "1",
+        "minPrice": "0.0001",
+        "maxPrice": "300",
+        "quantityPrecision": 0,
+        "pricePrecision": 4
+    },
+    "AVAXUSDT": {
+        "minQty": "1",
+        "maxQty": "10000000",
+        "stepSize": "1",
+        "minPrice": "0.0001",
+        "maxPrice": "1000",
+        "quantityPrecision": 0,
+        "pricePrecision": 4
+    },
+    "FTMUSDT": {
+        "minQty": "1",
+        "maxQty": "10000000",
+        "stepSize": "1",
+        "minPrice": "0.000001",
+        "maxPrice": "10",
+        "quantityPrecision": 0,
+        "pricePrecision": 6
+    },
+    "HNTUSDT": {
+        "minQty": "1",
+        "maxQty": "10000000",
+        "stepSize": "1",
+        "minPrice": "0.0001",
+        "maxPrice": "1000",
+        "quantityPrecision": 0,
+        "pricePrecision": 4
+    },
+    "ENJUSDT": {
+        "minQty": "1",
+        "maxQty": "10000000",
+        "stepSize": "1",
+        "minPrice": "0.00001",
+        "maxPrice": "100",
+        "quantityPrecision": 0,
+        "pricePrecision": 5
+    },
+    "FLMUSDT": {
+        "minQty": "1",
+        "maxQty": "10000000",
+        "stepSize": "1",
+        "minPrice": "0.0001",
+        "maxPrice": "1000",
+        "quantityPrecision": 0,
+        "pricePrecision": 4
+    },
+    "TOMOUSDT": {
+        "minQty": "1",
+        "maxQty": "10000000",
+        "stepSize": "1",
+        "minPrice": "0.0001",
+        "maxPrice": "1000",
+        "quantityPrecision": 0,
+        "pricePrecision": 4
+    },
+    "RENUSDT": {
+        "minQty": "1",
+        "maxQty": "10000000",
+        "stepSize": "1",
+        "minPrice": "0.00001",
+        "maxPrice": "100",
+        "quantityPrecision": 0,
+        "pricePrecision": 5
+    },
+    "KSMUSDT": {
+        "minQty": "0.1",
+        "maxQty": "1000000",
+        "stepSize": "0.1",
+        "minPrice": "0.001",
+        "maxPrice": "10000",
+        "quantityPrecision": 1,
+        "pricePrecision": 3
+    },
+    "NEARUSDT": {
+        "minQty": "1",
+        "maxQty": "10000000",
+        "stepSize": "1",
+        "minPrice": "0.0001",
+        "maxPrice": "1000",
+        "quantityPrecision": 0,
+        "pricePrecision": 4
+    },
+    "AAVEUSDT": {
+        "minQty": "0.1",
+        "maxQty": "1000000",
+        "stepSize": "0.1",
+        "minPrice": "0.001",
+        "maxPrice": "10000",
+        "quantityPrecision": 1,
+        "pricePrecision": 3
+    },
+    "FILUSDT": {
+        "minQty": "0.1",
+        "maxQty": "10000000",
+        "stepSize": "0.1",
+        "minPrice": "0.001",
+        "maxPrice": "10000",
+        "quantityPrecision": 1,
+        "pricePrecision": 3
+    },
+    "RSRUSDT": {
+        "minQty": "1",
+        "maxQty": "10000000",
+        "stepSize": "1",
+        "minPrice": "0.000001",
+        "maxPrice": "10",
+        "quantityPrecision": 0,
+        "pricePrecision": 6
+    },
+    "LRCUSDT": {
+        "minQty": "1",
+        "maxQty": "10000000",
+        "stepSize": "1",
+        "minPrice": "0.00001",
+        "maxPrice": "100",
+        "quantityPrecision": 0,
+        "pricePrecision": 5
+    },
+    "MATICUSDT": {
+        "minQty": "1",
+        "maxQty": "10000000",
+        "stepSize": "1",
+        "minPrice": "0.00001",
+        "maxPrice": "100",
+        "quantityPrecision": 0,
+        "pricePrecision": 5
+    },
+    "OCEANUSDT": {
+        "minQty": "1",
+        "maxQty": "10000000",
+        "stepSize": "1",
+        "minPrice": "0.00001",
+        "maxPrice": "100",
+        "quantityPrecision": 0,
+        "pricePrecision": 5
+    },
+    "CVCUSDT": {
+        "minQty": "1",
+        "maxQty": "10000000",
+        "stepSize": "1",
+        "minPrice": "0.00001",
+        "maxPrice": "100",
+        "quantityPrecision": 0,
+        "pricePrecision": 5
+    },
+    "BELUSDT": {
+        "minQty": "1",
+        "maxQty": "10000000",
+        "stepSize": "1",
+        "minPrice": "0.00001",
+        "maxPrice": "100",
+        "quantityPrecision": 0,
+        "pricePrecision": 5
+    },
+    "CTKUSDT": {
+        "minQty": "1",
+        "maxQty": "10000000",
+        "stepSize": "1",
+        "minPrice": "0.00001",
+        "maxPrice": "100",
+        "quantityPrecision": 0,
+        "pricePrecision": 5
+    },
+    "AXSUSDT": {
+        "minQty": "1",
+        "maxQty": "10000000",
+        "stepSize": "1",
+        "minPrice": "0.00001",
+        "maxPrice": "100",
+        "quantityPrecision": 0,
+        "pricePrecision": 5
+    },
+    "ALPHAUSDT": {
+        "minQty": "1",
+        "maxQty": "10000000",
+        "stepSize": "1",
+        "minPrice": "0.00001",
+        "maxPrice": "100",
+        "quantityPrecision": 0,
+        "pricePrecision": 5
+    },
+    "ZENUSDT": {
+        "minQty": "0.1",
+        "maxQty": "1000000",
+        "stepSize": "0.1",
+        "minPrice": "0.001",
+        "maxPrice": "10000",
+        "quantityPrecision": 1,
+        "pricePrecision": 3
+    },
+    "SKLUSDT": {
+        "minQty": "1",
+        "maxQty": "10000000",
+        "stepSize": "1",
+        "minPrice": "0.00001",
+        "maxPrice": "100",
+        "quantityPrecision": 0,
+        "pricePrecision": 5
+    },
+    "GRTUSDT": {
+        "minQty": "1",
+        "maxQty": "10000000",
+        "stepSize": "1",
+        "minPrice": "0.00001",
+        "maxPrice": "100",
+        "quantityPrecision": 0,
+        "pricePrecision": 5
+    },
+    "1INCHUSDT": {
+        "minQty": "1",
+        "maxQty": "1000000",
+        "stepSize": "1",
+        "minPrice": "0.0001",
+        "maxPrice": "100000",
+        "quantityPrecision": 0,
+        "pricePrecision": 4
+    },
+    "BTCBUSD": {
+        "minQty": "0.001",
+        "maxQty": "500",
+        "stepSize": "0.001",
+        "minPrice": "0.1",
+        "maxPrice": "500000",
+        "quantityPrecision": 3,
+        "pricePrecision": 1
+    },
+    "AKROUSDT": {
+        "minQty": "1",
+        "maxQty": "10000000",
+        "stepSize": "1",
+        "minPrice": "0.00001",
+        "maxPrice": "100",
+        "quantityPrecision": 0,
+        "pricePrecision": 5
+    },
+    "DOTECOUSDT": {
+        "minQty": "0.001",
+        "maxQty": "10000",
+        "stepSize": "0.001",
+        "minPrice": "0.1",
+        "maxPrice": "500000",
+        "quantityPrecision": 3,
+        "pricePrecision": 1
+    },
+    "CHZUSDT": {
+        "minQty": "1",
+        "maxQty": "10000000",
+        "stepSize": "1",
+        "minPrice": "0.00001",
+        "maxPrice": "100",
+        "quantityPrecision": 0,
+        "pricePrecision": 5
+    },
+    "SANDUSDT": {
+        "minQty": "1",
+        "maxQty": "10000000",
+        "stepSize": "1",
+        "minPrice": "0.00001",
+        "maxPrice": "100000",
+        "quantityPrecision": 0,
+        "pricePrecision": 5
+    },
+    "ANKRUSDT": {
+        "minQty": "1",
+        "maxQty": "10000000",
+        "stepSize": "1",
+        "minPrice": "0.000001",
+        "maxPrice": "100000",
+        "quantityPrecision": 0,
+        "pricePrecision": 6
+    },
+    "LUNAUSDT": {
+        "minQty": "1",
+        "maxQty": "1000000",
+        "stepSize": "1",
+        "minPrice": "0.0001",
+        "maxPrice": "100000",
+        "quantityPrecision": 0,
+        "pricePrecision": 4
+    },
+    "BTSUSDT": {
+        "minQty": "1",
+        "maxQty": "10000000",
+        "stepSize": "1",
+        "minPrice": "0.00001",
+        "maxPrice": "100000",
+        "quantityPrecision": 0,
+        "pricePrecision": 5
+    },
+    "BTCUSDT_210326": {
+        "minQty": "0.001",
+        "maxQty": "500",
+        "stepSize": "0.001",
+        "minPrice": "0.1",
+        "maxPrice": "500000",
+        "quantityPrecision": 3,
+        "pricePrecision": 1
+    },
+    "ETHUSDT_210326": {
+        "minQty": "0.001",
+        "maxQty": "10000",
+        "stepSize": "0.001",
+        "minPrice": "0.01",
+        "maxPrice": "100000",
+        "quantityPrecision": 3,
+        "pricePrecision": 2
+    }
+}

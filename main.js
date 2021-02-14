@@ -1,3 +1,4 @@
+const fs = require("fs");
 var Decimal = require("decimal.js");
 require("dotenv").config();
 const Binance = require("node-binance-api");
@@ -17,88 +18,145 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(router);
 
-var parse_msg = function (msg) {
-  var side = "";
-  var position = "";
-  var symbol = "";
-  var levs = [];
-  var entries = [];
-  var targets = [];
-  var stops = [];
+const minimumsJson = fs.readFileSync("minimums.json");
+const exchangeInfo = JSON.parse(minimumsJson);
 
-  // Side is Buy
-  // Position is Long
-  side_str = /(buy|sell) ?\/ ?(long|short)/gi.exec(msg)[0];
-  side = side_str.split("/")[0];
-  position = side_str.split("/")[1];
+const binanceImport = function (data) {
+  let minimums = {};
+  for (let obj of data.symbols) {
+    let filters = {
+      minNotional: 0.001,
+      minQty: 1,
+      maxQty: 10000000,
+      stepSize: 1,
+      minPrice: 0.00000001,
+      maxPrice: 100000,
+    };
+    for (let filter of obj.filters) {
+      if (filter.filterType == "MIN_NOTIONAL") {
+        filters.minNotional = filter.minNotional;
+      } else if (filter.filterType == "PRICE_FILTER") {
+        filters.minPrice = filter.minPrice;
+        filters.maxPrice = filter.maxPrice;
+      } else if (filter.filterType == "LOT_SIZE") {
+        filters.minQty = filter.minQty;
+        filters.maxQty = filter.maxQty;
+        filters.stepSize = filter.stepSize;
+        filters.quantityPrecision = obj.quantityPrecision;
+        filters.pricePrecision = obj.pricePrecision;
+      }
+    }
+    minimums[obj.symbol] = filters;
+  }
+  fs.writeFile(
+    "minimums.json",
+    JSON.stringify(minimums, null, 4),
+    function (err) {}
+  );
+};
 
-  console.log(side, position);
+const parseMesage = function (msg) {
+  try {
+    var side = "";
+    var position = "";
+    var symbol = "";
+    var levs = [];
+    var entries = [];
+    var targets = [];
+    var stops = [];
 
-  symbol = /#([0-9A-Z])\w+/g.exec(msg)[0];
-  // Symbol is #BTCUSDT, remove # if needed
-  symbol = symbol.split("#")[1];
+    // Side is Buy
+    // Position is Long
 
-  // Find substring in parentheses and find x5 x10 substring
-  lev_str = /\(.*futures ?\)/gi.exec(msg)[0];
-  levs = lev_str.match(/x\d+/g);
-  // Leverage is x10 x20, remove "x" if needed
-  // lev = lev.split("x")[1];
-  console.log(levs);
+    side_str = /(buy|sell) ?\/ ?(long|short)/gi.exec(msg);
+    if (!side_str) {
+      throw new Error("not good message");
+    }
+    side = side_str[0].split("/")[0];
+    position = side_str[0].split("/")[1];
 
-  // Find entry subtring and find entry price
-  entry_str = /entry(.*)\n?target/gi.exec(msg)[0];
-  entries = entry_str.match(/\d+\.?(\d+)?/g);
-  console.log(entries);
+    console.log(side, position);
 
-  // Find target subtring and find target percentage
-  target_str = /target(.*)\n?stop/gi.exec(msg)[0];
-  targets = target_str.match(/\d+\.?(\d+)?/g);
-  console.log(targets);
+    symbol = /#([0-9A-Z])\w+/g.exec(msg)[0];
+    // Symbol is #BTCUSDT, remove # if needed
+    symbol = symbol.split("#")[1];
 
-  // Find stoploss substrt and find stop percentage
-  stop_str = /stoploss:.*\n?-/gi.exec(msg)[0];
-  stops = stop_str.match(/\d+\.?(\d+)?/g);
-  console.log(stops);
+    // Find substring in parentheses and find x5 x10 substring
+    lev_str = /\(.*futures ?\)/gi.exec(msg)[0];
+    levs = lev_str.match(/x\d+/g);
+    // Leverage is x10 x20, remove "x" if needed
+    // lev = lev.split("x")[1];
+    console.log(levs);
 
-  return {
-    side: "Buy",
-    position: "Long",
-    symbol: symbol,
-    levs: levs,
-    entries: entries,
-    targets: targets,
-    stops: stops,
-  };
+    // Find entry subtring and find entry price
+    entry_str = /entry(.*)\n?target/gi.exec(msg)[0];
+    entries = entry_str.match(/\d+\.?(\d+)?/g);
+    console.log(entries);
+
+    // Find target subtring and find target percentage
+    target_str = /target(.*)\n?stop/gi.exec(msg)[0];
+    targets = target_str.match(/\d+\.?(\d+)?/g);
+    console.log(targets);
+
+    // Find stoploss substrt and find stop percentage
+    stop_str = /stoploss:.*\n?-/gi.exec(msg)[0];
+    stops = stop_str.match(/\d+\.?(\d+)?/g);
+    console.log(stops);
+
+    return {
+      side: "Buy",
+      position: "Long",
+      symbol: symbol,
+      levs: levs,
+      entries: entries,
+      targets: targets,
+      stops: stops,
+    };
+  } catch (error) {
+    throw error;
+  }
+};
+
+const setupFutures = async function (symbols) {
+  for (let symbol of symbols) {
+    console.log("setup symbol", symbol);
+    try {
+      console.log(
+        await client.futuresLeverage(
+          symbol,
+          Number(process.env.LEVERAGE_DEFAULT)
+        )
+      );
+    } catch (error) {
+      console.log(error);
+    }
+    try {
+      await client.futuresMarginType(symbol, "ISOLATED");
+    } catch (error) {
+      console.log(error);
+    }
+  }
+  return;
 };
 
 router.post("/future-order", async (req, res) => {
   console.log("req.body.message", req.body);
-  var message = parse_msg(req.body.message);
-  console.log("message", message);
+  let message;
   try {
-    await client.futuresLeverage({
-      symbol: `${message.symbol}USDT`,
-      leverage: Number(process.env.LEVERAGE_DEFAULT),
-    });
+    message = parseMesage(req.body.message);
+    console.log("message incomding:", message);
   } catch (error) {
-    console.log(error);
-  }
-  try {
-    await client.futuresMarginType({
-      symbol: `${message.symbol}USDT`,
-      marginType: "ISOLATED",
-    });
-  } catch (error) {
-    console.log(error);
+    console.log("error", error);
+    res.end("no");
+    return;
   }
 
-  const exchangeInfo = await client.futuresExchangeInfo(
-    `${message.symbol}USDT`
-  );
-  const currencyInfo = exchangeInfo.symbols.filter(
-    (x) => x.symbol === `${message.symbol}USDT`
-  )[0];
+  if (!message) {
+    res.end("no");
+    return;
+  }
 
+  const currencyInfo = exchangeInfo[`${message.symbol}USDT`];
   const currentPrice = (await client.futuresMarkPrice(`${message.symbol}USDT`))
     .markPrice;
 
@@ -111,11 +169,10 @@ router.post("/future-order", async (req, res) => {
     .toFixed(currencyInfo.quantityPrecision);
 
   try {
-    const marketBuyOrder = await client.futuresMarketBuy(
+    console.log(await client.futuresMarketBuy(
       `${message.symbol}USDT`,
       quantity.toString()
-    );
-
+    ));
     let entryPrice;
     let position_data = await client.futuresPositionRisk(),
       markets = Object.keys(position_data);
@@ -126,14 +183,12 @@ router.post("/future-order", async (req, res) => {
       entryPrice = obj.entryPrice;
     }
     console.log(entryPrice);
-
     const takeProfitPrice = new Decimal(entryPrice).mul(
       1 + Number(process.env.TAKEPROFIT_PERCENT)
     );
     const stoplossPrice = new Decimal(entryPrice).mul(
       1 - Number(process.env.STOPLOSS_PERCENT)
     );
-
     console.log(
       await client.futuresSell(
         `${message.symbol}USDT`,
@@ -147,7 +202,6 @@ router.post("/future-order", async (req, res) => {
         }
       )
     );
-
     console.log(
       await client.futuresSell(
         `${message.symbol}USDT`,
