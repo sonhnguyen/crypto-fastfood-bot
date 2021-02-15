@@ -53,7 +53,7 @@ const binanceImport = function (data) {
   fs.writeFile(
     "minimums.json",
     JSON.stringify(minimums, null, 4),
-    function (err) { }
+    function (err) {}
   );
 };
 
@@ -81,8 +81,9 @@ const parseMesage = function (msg) {
 
     symbol = /#([0-9A-Z])\w+/g.exec(msg)[0];
     // Symbol is #BTCUSDT, remove # if needed
-    symbol = symbol.split("#")[1];
+    symbol = symbol.split("#")[1] + "USDT";
 
+    console.log("SYMBOL:", symbol);
     // Find substring in parentheses and find x5 x10 substring
     lev_str = /\(.*futures ?\)/gi.exec(msg)[0];
     levs = lev_str.match(/x\d+/g);
@@ -141,27 +142,10 @@ const setupFutures = async function (symbols) {
   return;
 };
 
-router.post("/future-order", async (req, res) => {
-  console.log("req.body.message", req.body);
-  let message;
-  try {
-    message = parseMesage(req.body.message);
-    console.log("message incomding:", message);
-  } catch (error) {
-    console.log("error", error);
-    res.end("no");
-    return;
-  }
-
-  if (!message) {
-    res.end("no");
-    return;
-  }
-
-  // await setupFutures(Object.keys(exchangeInfo));
-  const currencyInfo = exchangeInfo[`${message.symbol}USDT`];
-  const currentPrice = (await client.futuresMarkPrice(`${message.symbol}USDT`))
-    .markPrice;
+const executeTrade = async (symbol) => {
+  console.log("executeTrade", symbol);
+  const currencyInfo = exchangeInfo[`${symbol}`];
+  const currentPrice = (await client.futuresMarkPrice(`${symbol}`)).markPrice;
 
   const balancePerTrade = new Decimal(process.env.USD_PER_TRADE).mul(
     process.env.LEVERAGE_DEFAULT
@@ -171,17 +155,17 @@ router.post("/future-order", async (req, res) => {
     .div(currentPrice)
     .toFixed(currencyInfo.quantityPrecision);
 
+  // console.log("await client.futuresBalance()", await client.futuresBalance())
+  // console.log("await client.futuresCancelAll()", await client.futuresBalance())
+
   try {
     console.log(
-      await client.futuresMarketBuy(
-        `${message.symbol}USDT`,
-        quantity.toString()
-      )
+      await client.futuresMarketBuy(`${symbol}`, quantity.toString())
     );
     let entryPrice;
     let position_data = await client.futuresPositionRisk();
     const positionData = position_data.filter(
-      (p) => p.symbol == `${message.symbol}USDT`
+      (p) => p.symbol == `${symbol}`
     )[0];
 
     const size = Number(positionData.positionAmt);
@@ -192,92 +176,171 @@ router.post("/future-order", async (req, res) => {
     }
     entryPrice = positionData.entryPrice;
 
-    const takeProfitPrice = new Decimal(entryPrice).mul(
-      1 + Number(process.env.TAKEPROFIT_PERCENT)
+    const activationPrice = new Decimal(entryPrice)
+      .mul(1 + Number(process.env.TRAILING_ACTIVATION_PRICE))
+      .toFixed(currencyInfo.pricePrecision)
+      .toString();
+
+    let trailProfit = await client.futuresOrder(
+      "SELL",
+      `${symbol}`,
+      quantity.toString(),
+      false,
+      {
+        activationPrice,
+        type: "TRAILING_STOP_MARKET",
+        callbackRate: Number(process.env.TRAILING_CALLBACK_RATE),
+        reduceOnly: true,
+      }
     );
-    const stoplossPrice = new Decimal(entryPrice).mul(
-      1 - Number(process.env.STOPLOSS_PERCENT)
+    console.log(trailProfit);
+
+    const stopPrice = new Decimal(entryPrice)
+      .mul(1 - Number(process.env.STOPLOSS_PERCENT))
+      .toFixed(currencyInfo.pricePrecision)
+      .toString();
+
+    let stopOrder = await client.futuresOrder(
+      "SELL",
+      `${symbol}`,
+      quantity.toString(),
+      false,
+      {
+        stopPrice,
+        type: "STOP_MARKET",
+        closePosition: true,
+      }
     );
-    console.log(
-      await client.futuresSell(
-        `${message.symbol}USDT`,
-        quantity.toString(),
-        takeProfitPrice.toFixed(currencyInfo.pricePrecision).toString(),
-        {
-          stopPrice: takeProfitPrice
-            .toFixed(currencyInfo.pricePrecision)
-            .toString(),
-          type: "TAKE_PROFIT",
-        }
-      )
-    );
-    console.log(
-      await client.futuresSell(
-        `${message.symbol}USDT`,
-        quantity.toString(),
-        stoplossPrice.toFixed(currencyInfo.pricePrecision).toString(),
-        {
-          stopPrice: stoplossPrice
-            .toFixed(currencyInfo.pricePrecision)
-            .toString(),
-          type: "STOP",
-        }
-      )
-    );
+    console.info(stopOrder);
+
+    // const takeProfitPrice = new Decimal(entryPrice).mul(
+    //   1 + Number(process.env.TAKEPROFIT_PERCENT)
+    // );
+    // console.log(
+    //   await client.futuresSell(
+    //     `${symbol}`,
+    //     quantity.toString(),
+    //     takeProfitPrice.toFixed(currencyInfo.pricePrecision).toString(),
+    //     {
+    //       stopPrice: takeProfitPrice
+    //         .toFixed(currencyInfo.pricePrecision)
+    //         .toString(),
+    //       type: "TAKE_PROFIT",
+    //     }
+    //   )
+    // );
+    // console.log(
+    //   await client.futuresSell(
+    //     `${symbol}`,
+    //     quantity.toString(),
+    //     stoplossPrice.toFixed(currencyInfo.pricePrecision).toString(),
+    //     {
+    //       stopPrice: stoplossPrice
+    //         .toFixed(currencyInfo.pricePrecision)
+    //         .toString(),
+    //       type: "STOP",
+    //     }
+    //   )
+    // );
     console.log("entry:", entryPrice);
-    console.log("stoploss:", stoplossPrice);
-    console.log("takeProfit:", takeProfitPrice);
+    console.log("stoploss:", stopPrice);
+    console.log("takeProfit trailing activation price:", activationPrice);
   } catch (error) {
     console.log(error);
   }
+  return;
+};
+
+router.post("/future-order", async (req, res) => {
+  console.log("req.body.message", req.body);
+  let message;
+  try {
+    message = parseMesage(req.body.message);
+    console.log("message incomding:", message);
+  } catch (error) {
+    console.log("error", error);
+    if (req.body.message.toLowerCase().includes("are you ready")) {
+      const queryTopPossibles = await currentSpikeCoin(Date.now());
+      console.log("queryTopPossibles", queryTopPossibles)
+      message = {
+        symbol: queryTopPossibles[0].symbol,
+      };
+    } else {
+      res.end("no");
+      return;
+    }
+  }
+
+  if (!message) {
+    res.end("no");
+    return;
+  }
+
+  await executeTrade(message.symbol);
   res.end("yes");
 });
 
+const currentSpikeCoin = async (occurAt) => {
+  var symbolMap = { ...SYMBOLS_MAP };
+
+  await Promise.all(
+    Object.keys(symbolMap).map((s) => {
+      return new Promise(async (resolve, reject) => {
+        d = await client.futuresCandles(s, "1m", {
+          startTime: occurAt - 15 * 60 * 1000,
+          endTime: occurAt,
+          limit: 1000,
+        });
+        symbolMap[s].candles = d.map((e) => ({
+          openTimeString: new Date(e[0]),
+          openTime: e[0],
+          open: e[1],
+          high: e[2],
+          low: e[3],
+          close: e[4],
+          volume: e[5],
+          closeTime: e[6],
+          quoteAssetVolume: e[7],
+          numberOfTrades: e[8],
+          "Taker buy base asset volume": e[9],
+          "Taker buy quote asset volume": e[10],
+          change: ((Number(e[4]) - Number(e[1])) / Number(e[1])) * 100,
+        }));
+        symbolMap[s].symbol = s;
+        symbolMap[s].firstCandle = symbolMap[s].candles[0];
+        symbolMap[s].lastCandle =
+          symbolMap[s].candles[symbolMap[s].candles.length - 1];
+
+        symbolMap[s].changePercent =
+          ((Number(symbolMap[s].lastCandle.open) -
+            Number(symbolMap[s].firstCandle.open)) /
+            Number(symbolMap[s].firstCandle.open)) *
+          100;
+        symbolMap[s].highestChangePercentCandle = Math.max(
+          ...symbolMap[s].candles.map((c) => c.change)
+        );
+        resolve();
+      });
+    })
+  );
+  var r = Object.values(symbolMap).sort(
+    (a, b) => b.changePercent - a.changePercent
+  );
+  return r;
+};
+
 router.post("/ready-msg", async (req, res) => {
   // var occurAt = Number(new Date(2021, 1, 13, 0, 18, 32))
-  var occurAt = Date.now()
-  var symbolMap = { ...SYMBOLS_MAP }
-
-  await Promise.all(Object.keys(symbolMap).map(s => {
-
-    return new Promise(async (resolve, reject) => {
-      d = await client.futuresCandles(s, '1m', {
-        startTime: occurAt - 15 * 60 * 1000,
-        endTime: occurAt,
-        limit: 1000
-      });
-      symbolMap[s].candles = d.map(e => ({
-        openTimeString: new Date(e[0]),
-        openTime: e[0],
-        open: e[1],
-        high: e[2],
-        low: e[3],
-        close: e[4],
-        volume: e[5],
-        closeTime: e[6],
-        quoteAssetVolume: e[7],
-        numberOfTrades: e[8],
-        "Taker buy base asset volume": e[9],
-        "Taker buy quote asset volume": e[10],
-        change: (Number(e[4]) - Number(e[1])) / Number(e[1]) * 100
-      }))
-      symbolMap[s].symbol = s;
-      symbolMap[s].firstCandle = symbolMap[s].candles[0]
-      symbolMap[s].lastCandle = symbolMap[s].candles[symbolMap[s].candles.length - 1]
-
-      symbolMap[s].changePercent = (Number(symbolMap[s].lastCandle.open) - Number(symbolMap[s].firstCandle.open)) / Number(symbolMap[s].firstCandle.open) * 100
-      symbolMap[s].highestChangePercentCandle = Math.max(...symbolMap[s].candles.map(c => c.change))
-      resolve();
-    })
-  }))
-  var r = Object.values(symbolMap).sort((a, b) => b.changePercent - a.changePercent);
+  var occurAt = Date.now();
+  const result = await currentSpikeCoin(occurAt);
   // res.json(r)
-  res.json(r.map(e => `${e.symbol} ${e.changePercent}%`))
-})
+  res.json(result.map((e) => `${e.symbol} ${e.changePercent}%`));
+});
+
 app.listen(Number(process.env.PORT), async () => {
   SYMBOLS = (await client.futuresExchangeInfo()).symbols;
-  SYMBOLS.forEach(s => {
-    SYMBOLS_MAP[s.symbol] = {}
-  })
+  SYMBOLS.forEach((s) => {
+    SYMBOLS_MAP[s.symbol] = {};
+  });
   console.log(`Started on PORT ${Number(process.env.PORT)}`);
 });
