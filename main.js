@@ -7,6 +7,16 @@ const client = new Binance().options({
   APISECRET: process.env.BINANCE_SECRET_KEY,
 });
 
+const binanceKeys = process.env.BINANCE_ACCOUNT_APIS.split(",");
+const binanceSecrets = process.env.BINANCE_ACCOUNT_SECRETS.split(",");
+
+const binanceAccountClients = binanceKeys.map((_, index) => {
+  return new Binance().options({
+    APIKEY: binanceKeys[index],
+    APISECRET: binanceSecrets[index],
+  });
+});
+
 const express = require("express");
 const bodyParser = require("body-parser");
 const router = express.Router();
@@ -120,32 +130,11 @@ const parseMesage = function (msg) {
   }
 };
 
-const setupFutures = async function (symbols) {
-  for (let symbol of symbols) {
-    console.log("setup symbol", symbol);
-    try {
-      console.log(
-        await client.futuresLeverage(
-          symbol,
-          Number(process.env.LEVERAGE_DEFAULT)
-        )
-      );
-    } catch (error) {
-      console.log(error);
-    }
-    try {
-      await client.futuresMarginType(symbol, "ISOLATED");
-    } catch (error) {
-      console.log(error);
-    }
-  }
-  return;
-};
-
-const executeTrade = async (symbol) => {
+const executeTrade = async (symbol, binanceClient) => {
   console.log("executeTrade", symbol);
   const currencyInfo = exchangeInfo[`${symbol}`];
-  const currentPrice = (await client.futuresMarkPrice(`${symbol}`)).markPrice;
+  const currentPrice = (await binanceClient.futuresMarkPrice(`${symbol}`))
+    .markPrice;
 
   const balancePerTrade = new Decimal(process.env.USD_PER_TRADE).mul(
     process.env.LEVERAGE_DEFAULT
@@ -155,15 +144,15 @@ const executeTrade = async (symbol) => {
     .div(currentPrice)
     .toFixed(currencyInfo.quantityPrecision);
 
-  // console.log("await client.futuresBalance()", await client.futuresBalance())
-  // console.log("await client.futuresCancelAll()", await client.futuresBalance())
+  // console.log("await binanceClient.futuresBalance()", await binanceClient.futuresBalance())
+  // console.log("await binanceClient.futuresCancelAll()", await binanceClient.futuresBalance())
 
   try {
     console.log(
-      await client.futuresMarketBuy(`${symbol}`, quantity.toString())
+      await binanceClient.futuresMarketBuy(`${symbol}`, quantity.toString())
     );
     let entryPrice;
-    let position_data = await client.futuresPositionRisk();
+    let position_data = await binanceClient.futuresPositionRisk();
     const positionData = position_data.filter(
       (p) => p.symbol == `${symbol}`
     )[0];
@@ -171,7 +160,6 @@ const executeTrade = async (symbol) => {
     const size = Number(positionData.positionAmt);
     if (size == 0) {
       console.log("no position found");
-      res.end("yes");
       return;
     }
     entryPrice = positionData.entryPrice;
@@ -181,7 +169,7 @@ const executeTrade = async (symbol) => {
       .toFixed(currencyInfo.pricePrecision)
       .toString();
 
-    let trailProfit = await client.futuresOrder(
+    let trailProfit = await binanceClient.futuresOrder(
       "SELL",
       `${symbol}`,
       quantity.toString(),
@@ -200,7 +188,7 @@ const executeTrade = async (symbol) => {
       .toFixed(currencyInfo.pricePrecision)
       .toString();
 
-    let stopOrder = await client.futuresOrder(
+    let stopOrder = await binanceClient.futuresOrder(
       "SELL",
       `${symbol}`,
       quantity.toString(),
@@ -217,7 +205,7 @@ const executeTrade = async (symbol) => {
     //   1 + Number(process.env.TAKEPROFIT_PERCENT)
     // );
     // console.log(
-    //   await client.futuresSell(
+    //   await binanceClient.futuresSell(
     //     `${symbol}`,
     //     quantity.toString(),
     //     takeProfitPrice.toFixed(currencyInfo.pricePrecision).toString(),
@@ -230,7 +218,7 @@ const executeTrade = async (symbol) => {
     //   )
     // );
     // console.log(
-    //   await client.futuresSell(
+    //   await binanceClient.futuresSell(
     //     `${symbol}`,
     //     quantity.toString(),
     //     stoplossPrice.toFixed(currencyInfo.pricePrecision).toString(),
@@ -261,7 +249,6 @@ router.post("/future-order", async (req, res) => {
     console.log("error", error);
     if (req.body.message.toLowerCase().includes("are you ready")) {
       const queryTopPossibles = await currentSpikeCoin(Date.now());
-      console.log("queryTopPossibles", queryTopPossibles)
       message = {
         symbol: queryTopPossibles[0].symbol,
       };
@@ -276,7 +263,17 @@ router.post("/future-order", async (req, res) => {
     return;
   }
 
-  await executeTrade(message.symbol);
+  console.log(
+    "process.env.IS_MULTIPLE_CLIENTS",
+    process.env.IS_MULTIPLE_CLIENTS
+  );
+  if (process.env.IS_MULTIPLE_CLIENTS == "true") {
+    for (const binanceClient of binanceAccountClients) {
+      await executeTrade(message.symbol, binanceClient);
+    }
+  } else {
+    await executeTrade(message.symbol, client);
+  }
   res.end("yes");
 });
 
