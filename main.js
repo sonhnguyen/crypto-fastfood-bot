@@ -185,6 +185,7 @@ router.post("/future-order", async (req, res) => {
     const size = Number(positionData.positionAmt);
     if (size == 0) {
       console.log("no position found");
+      res.end("yes");
       return;
     }
     entryPrice = positionData.entryPrice;
