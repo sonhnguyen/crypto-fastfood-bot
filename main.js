@@ -271,7 +271,7 @@ router.post("/ready-msg", async (req, res) => {
     })
   }))
   var r = Object.values(symbolMap).sort((a, b) => b.changePercent - a.changePercent);
-  res.json(r)
+  // res.json(r)
   res.json(r.map(e => `${e.symbol} ${e.changePercent}%`))
 })
 app.listen(Number(process.env.PORT), async () => {
