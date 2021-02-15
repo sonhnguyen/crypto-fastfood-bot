@@ -18,6 +18,8 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(router);
 
+var SYMBOLS = [];
+var SYMBOLS_MAP = {};
 const minimumsJson = fs.readFileSync("minimums.json");
 const exchangeInfo = JSON.parse(minimumsJson);
 
@@ -51,7 +53,7 @@ const binanceImport = function (data) {
   fs.writeFile(
     "minimums.json",
     JSON.stringify(minimums, null, 4),
-    function (err) {}
+    function (err) { }
   );
 };
 
@@ -231,6 +233,51 @@ router.post("/future-order", async (req, res) => {
   res.end("yes");
 });
 
-app.listen(Number(process.env.PORT), () => {
+router.post("/ready-msg", async (req, res) => {
+  // var occurAt = Number(new Date(2021, 1, 13, 0, 18, 32))
+  var occurAt = Date.now()
+  var symbolMap = { ...SYMBOLS_MAP }
+
+  await Promise.all(Object.keys(symbolMap).map(s => {
+
+    return new Promise(async (resolve, reject) => {
+      d = await client.futuresCandles(s, '1m', {
+        startTime: occurAt - 15 * 60 * 1000,
+        endTime: occurAt,
+        limit: 1000
+      });
+      symbolMap[s].candles = d.map(e => ({
+        openTimeString: new Date(e[0]),
+        openTime: e[0],
+        open: e[1],
+        high: e[2],
+        low: e[3],
+        close: e[4],
+        volume: e[5],
+        closeTime: e[6],
+        quoteAssetVolume: e[7],
+        numberOfTrades: e[8],
+        "Taker buy base asset volume": e[9],
+        "Taker buy quote asset volume": e[10],
+        change: (Number(e[4]) - Number(e[1])) / Number(e[1]) * 100
+      }))
+      symbolMap[s].symbol = s;
+      symbolMap[s].firstCandle = symbolMap[s].candles[0]
+      symbolMap[s].lastCandle = symbolMap[s].candles[symbolMap[s].candles.length - 1]
+
+      symbolMap[s].changePercent = (Number(symbolMap[s].lastCandle.open) - Number(symbolMap[s].firstCandle.open)) / Number(symbolMap[s].firstCandle.open) * 100
+      symbolMap[s].highestChangePercentCandle = Math.max(...symbolMap[s].candles.map(c => c.change))
+      resolve();
+    })
+  }))
+  var r = Object.values(symbolMap).sort((a, b) => b.changePercent - a.changePercent);
+  res.json(r)
+  res.json(r.map(e => `${e.symbol} ${e.changePercent}%`))
+})
+app.listen(Number(process.env.PORT), async () => {
+  SYMBOLS = (await client.futuresExchangeInfo()).symbols;
+  SYMBOLS.forEach(s => {
+    SYMBOLS_MAP[s.symbol] = {}
+  })
   console.log(`Started on PORT ${Number(process.env.PORT)}`);
 });
