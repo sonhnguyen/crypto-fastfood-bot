@@ -211,9 +211,12 @@ const executeTrade = async (symbol, binanceClient) => {
   let balancePerTrade;
   if (process.env.IS_ALLIN == "true") {
     const accountBalance = await binanceClient.futuresBalance();
-    balancePerTrade = new Decimal(accountBalance[0].balance)
-      .mul(0.93)
-      .mul(process.env.LEVERAGE_DEFAULT);
+    balancePerTrade =
+      Number(accountBalance[0].balance) > 1000
+        ? new Decimal(1000).mul(process.env.LEVERAGE_DEFAULT)
+        : new Decimal(accountBalance[0].balance)
+            .mul(0.93)
+            .mul(process.env.LEVERAGE_DEFAULT);
   } else {
     balancePerTrade = new Decimal(process.env.USD_PER_TRADE).mul(
       process.env.LEVERAGE_DEFAULT
