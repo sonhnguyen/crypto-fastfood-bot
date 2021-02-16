@@ -19,10 +19,18 @@ const binanceAccountClients = binanceKeys.map((_, index) => {
 const main = async function () {
   if (process.env.IS_MULTIPLE_CLIENTS == "true") {
     for (const binanceClient of binanceAccountClients) {
-      console.log(await binanceClient.futuresBalance());
+      console.log((await binanceClient.futuresBalance())[0]);
+      const existedPositions = (
+        await binanceClient.futuresPositionRisk()
+      ).filter((x) => x.positionAmt > 0);
+      console.log(existedPositions);
     }
   } else {
-    console.log(await client.futuresBalance());
+    console.log((await client.futuresBalance())[0]);
+    const existedPositions = (await binanceClient.futuresPositionRisk()).filter(
+      (x) => x.positionAmt > 0
+    );
+    console.log(existedPositions);
   }
 };
 
