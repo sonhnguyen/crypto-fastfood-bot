@@ -323,8 +323,8 @@ const cancelAllOrdersAndPositions = async (binanceClient) => {
   }
   const openOrders = await binanceClient.futuresOpenOrders();
   for (const order of openOrders) {
-    await binanceClient.futuresCancel(order.symbol, { orderId: order.orderId });
-    console.log("close order: ", order.symbol, "size:", order.orderId);
+    await binanceClient.futuresCancelAll(order.symbol);
+    console.log("close order: ", order.symbol);
   }
   return;
 };
