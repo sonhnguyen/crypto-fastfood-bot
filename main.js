@@ -208,9 +208,17 @@ const executeTrade = async (symbol, binanceClient) => {
   const currentPrice = (await binanceClient.futuresMarkPrice(`${symbol}`))
     .markPrice;
 
-  const balancePerTrade = new Decimal(process.env.USD_PER_TRADE).mul(
-    process.env.LEVERAGE_DEFAULT
-  );
+  let balancePerTrade;
+  if (process.env.IS_ALLIN == "true") {
+    const accountBalance = await binanceClient.futuresBalance();
+    balancePerTrade = new Decimal(accountBalance[0].balance)
+      .mul(0.93)
+      .mul(process.env.LEVERAGE_DEFAULT);
+  } else {
+    balancePerTrade = new Decimal(process.env.USD_PER_TRADE).mul(
+      process.env.LEVERAGE_DEFAULT
+    );
+  }
 
   const quantity = balancePerTrade
     .div(currentPrice)
