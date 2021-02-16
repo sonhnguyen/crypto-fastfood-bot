@@ -370,6 +370,7 @@ router.post("/future-order", async (req, res) => {
       await executeTrade(message.symbol, client);
     }
   } else {
+    console.log("unsupported command:", req.body.message);
     res.end("no");
     return;
   }
