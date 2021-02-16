@@ -189,11 +189,12 @@ const executeTrade = async (symbol, binanceClient) => {
   );
   for (const position of existedPositions) {
     if (position.symbol != symbol) {
-      order = await binanceClient.futuresMarketSell(
+      await binanceClient.futuresMarketSell(
         position.symbol,
         position.positionAmt,
         { reduceOnly: true }
       );
+      await binanceClient.futuresCancelAll(position.symbol);
       console.log(
         "close position: ",
         position.symbol,
