@@ -41,7 +41,6 @@ const setupFutures = async function (symbols, binanceClient) {
   return;
 };
 
-
 const binanceImport = function (data) {
   let minimums = {};
   for (let obj of data.symbols) {

@@ -395,7 +395,7 @@ router.post("/future-order", async (req, res) => {
 
 router.post("/ready-msg", async (req, res) => {
   // var occurAt = Number(new Date(2021, 1, 16, 17, 56))
-  // var occurAt = Date.now();
+  var occurAt = Date.now();
   const result = await currentSpikeCoin(occurAt);
   res.json(result.map((e) => `${e.symbol} ${e.changePercent}%`));
 });
