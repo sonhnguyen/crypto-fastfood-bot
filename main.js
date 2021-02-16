@@ -30,6 +30,8 @@ app.use(router);
 
 const SYMBOLS_MAP = {
   SOLUSDT: {},
+  ICXUSDT: {},
+  MATICUSDT: {},
   COMPUSDT: {},
   RENUSDT: {},
   QTUMUSDT: {},
