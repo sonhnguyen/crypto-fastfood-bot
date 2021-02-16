@@ -184,7 +184,7 @@ const parseMesage = function (msg) {
 
 const executeTrade = async (symbol, binanceClient) => {
   console.log("executeTrade", symbol);
-  const existedPositions = (await client.futuresPositionRisk()).filter(
+  const existedPositions = (await binanceClient.futuresPositionRisk()).filter(
     (x) => x.positionAmt > 0
   );
   for (const position of existedPositions) {
@@ -310,41 +310,70 @@ const executeTrade = async (symbol, binanceClient) => {
   return;
 };
 
-router.post("/future-order", async (req, res) => {
-  console.log("req.body.message", req.body);
-  let message;
-  try {
-    message = parseMesage(req.body.message);
-    console.log("message incomding:", message);
-  } catch (error) {
-    console.log("error", error);
-    if (req.body.message.toLowerCase().includes("are you ready")) {
-      const queryTopPossibles = await currentSpikeCoin(Date.now());
-      message = {
-        symbol: queryTopPossibles[0].symbol,
-      };
-    } else {
-      res.end("no");
-      return;
-    }
+const cancelAllOrdersAndPositions = async (binanceClient) => {
+  const existedPositions = (await binanceClient.futuresPositionRisk()).filter(
+    (x) => x.positionAmt > 0
+  );
+  for (const position of existedPositions) {
+    await binanceClient.futuresMarketSell(
+      position.symbol,
+      position.positionAmt,
+      { reduceOnly: true }
+    );
   }
+  const openOrders = await binanceClient.futuresOpenOrders();
+  for (const order of openOrders) {
+    await binanceClient.futuresCancel(order.symbol, { orderId: order.orderId });
+    console.log("close order: ", order.symbol, "size:", order.orderId);
+  }
+  return;
+};
 
-  if (!message) {
+router.post("/future-order", async (req, res) => {
+  console.log("req.body.message", req.body.message);
+  let message;
+  if (req.body.message.toLowerCase().includes("are you ready")) {
+    const queryTopPossibles = await currentSpikeCoin(Date.now());
+    message = {
+      symbol: queryTopPossibles[0].symbol,
+    };
+    console.log(
+      "process.env.IS_MULTIPLE_CLIENTS",
+      process.env.IS_MULTIPLE_CLIENTS
+    );
+    if (process.env.IS_MULTIPLE_CLIENTS == "true") {
+      for (const binanceClient of binanceAccountClients) {
+        await executeTrade(message.symbol, binanceClient);
+      }
+    } else {
+      await executeTrade(message.symbol, client);
+    }
+  } else if (req.body.message.toLowerCase().includes("cancel all")) {
+    if (process.env.IS_MULTIPLE_CLIENTS == "true") {
+      for (const binanceClient of binanceAccountClients) {
+        await executeTrade(message.symbol, binanceClient);
+      }
+    } else {
+      await executeTrade(message.symbol, client);
+    }
+  } else if (req.body.message.toLowerCase().includes("buy / long:")) {
+    message = parseMesage(req.body.message);
+    console.log(
+      "process.env.IS_MULTIPLE_CLIENTS",
+      process.env.IS_MULTIPLE_CLIENTS
+    );
+    if (process.env.IS_MULTIPLE_CLIENTS == "true") {
+      for (const binanceClient of binanceAccountClients) {
+        await executeTrade(message.symbol, binanceClient);
+      }
+    } else {
+      await executeTrade(message.symbol, client);
+    }
+  } else {
     res.end("no");
     return;
   }
 
-  console.log(
-    "process.env.IS_MULTIPLE_CLIENTS",
-    process.env.IS_MULTIPLE_CLIENTS
-  );
-  if (process.env.IS_MULTIPLE_CLIENTS == "true") {
-    for (const binanceClient of binanceAccountClients) {
-      await executeTrade(message.symbol, binanceClient);
-    }
-  } else {
-    await executeTrade(message.symbol, client);
-  }
   res.end("yes");
 });
 
@@ -360,5 +389,6 @@ app.listen(Number(process.env.PORT), async () => {
   //   Number(new Date(2021, 1, 11, 16, 38))
   // );
   // console.log(result[0].symbol)
+
   console.log(`Started on PORT ${Number(process.env.PORT)}`);
 });
