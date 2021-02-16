@@ -351,10 +351,10 @@ router.post("/future-order", async (req, res) => {
   } else if (req.body.message.toLowerCase().includes("cancel all")) {
     if (process.env.IS_MULTIPLE_CLIENTS == "true") {
       for (const binanceClient of binanceAccountClients) {
-        await executeTrade(message.symbol, binanceClient);
+        await cancelAllOrdersAndPositions(binanceClient);
       }
     } else {
-      await executeTrade(message.symbol, client);
+      await cancelAllOrdersAndPositions(client);
     }
   } else if (req.body.message.toLowerCase().includes("buy / long:")) {
     message = parseMesage(req.body.message);
