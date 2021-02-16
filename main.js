@@ -148,20 +148,19 @@ const executeTrade = async (symbol, binanceClient) => {
   // console.log("await binanceClient.futuresCancelAll()", await binanceClient.futuresBalance())
 
   try {
-    console.log(
-      await binanceClient.futuresMarketBuy(`${symbol}`, quantity.toString())
+    const buyOrder = await binanceClient.futuresMarketBuy(
+      `${symbol}`,
+      quantity.toString()
     );
+    console.log(buyOrder);
+    if (buyOrder.msg) {
+      throw Error(buyOrder.msg);
+    }
     let entryPrice;
     let position_data = await binanceClient.futuresPositionRisk();
     const positionData = position_data.filter(
       (p) => p.symbol == `${symbol}`
     )[0];
-
-    const size = Number(positionData.positionAmt);
-    if (size == 0) {
-      console.log("no position found");
-      return;
-    }
     entryPrice = positionData.entryPrice;
 
     const activationPrice = new Decimal(entryPrice)
