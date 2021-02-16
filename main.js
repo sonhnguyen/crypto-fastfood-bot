@@ -353,5 +353,9 @@ router.post("/ready-msg", async (req, res) => {
 });
 
 app.listen(Number(process.env.PORT), async () => {
+  // const result = await currentSpikeCoin(
+  //   Number(new Date(2021, 1, 11, 16, 38))
+  // );
+  // console.log(result[0].symbol)
   console.log(`Started on PORT ${Number(process.env.PORT)}`);
 });
