@@ -153,29 +153,11 @@ const parseMesage = function (msg) {
     // lev = lev.split("x")[1];
     console.log(levs);
 
-    // Find entry subtring and find entry price
-    entry_str = /entry(.*)\n?target/gi.exec(msg)[0];
-    entries = entry_str.match(/\d+\.?(\d+)?/g);
-    console.log(entries);
-
-    // Find target subtring and find target percentage
-    target_str = /target(.*)\n?stop/gi.exec(msg)[0];
-    targets = target_str.match(/\d+\.?(\d+)?/g);
-    console.log(targets);
-
-    // Find stoploss substrt and find stop percentage
-    stop_str = /stoploss:.*\n?-/gi.exec(msg)[0];
-    stops = stop_str.match(/\d+\.?(\d+)?/g);
-    console.log(stops);
-
     return {
       side: "Buy",
       position: "Long",
       symbol: symbol,
       levs: levs,
-      entries: entries,
-      targets: targets,
-      stops: stops,
     };
   } catch (error) {
     throw error;
@@ -404,6 +386,6 @@ app.listen(Number(process.env.PORT), async () => {
   // const result = await currentSpikeCoin(Number(new Date(2021, 1, 16, 17, 56)));
   // console.log(result[0].symbol);
 
-  // console.log("current spike:", (await currentSpikeCoin(Date.now()))[0].symbol);
+  console.log("current spike:", (await currentSpikeCoin(Date.now()))[0].symbol);
   console.log(`Started on PORT ${Number(process.env.PORT)}`);
 });
