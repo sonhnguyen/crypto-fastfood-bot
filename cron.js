@@ -174,6 +174,9 @@ const executeTrade = async (symbol, binanceClient) => {
         "size:",
         position.positionAmt
       );
+    } else {
+      console.log("existed position:", symbol)
+      return;
     }
   }
   const openOrders = await binanceClient.futuresOpenOrders();
