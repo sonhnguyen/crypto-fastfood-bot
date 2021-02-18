@@ -178,8 +178,10 @@ const executeTrade = async (symbol, binanceClient) => {
   }
   const openOrders = await binanceClient.futuresOpenOrders();
   for (const order of openOrders) {
-    await binanceClient.futuresCancelAll(order.symbol);
-    console.log("close order: ", order.symbol);
+    if (order.symbol != symbol) {
+      console.log("close order: ", order.symbol);
+      await binanceClient.futuresCancelAll(order.symbol);
+    }
   }
 
   const currencyInfo = exchangeInfo[`${symbol}`];
@@ -289,7 +291,7 @@ const cancelAllOrdersAndPositions = async (binanceClient) => {
   return;
 };
 
-cron.schedule("*/6 * * * *", async function () {
+cron.schedule("*/10 * * * * *", async function () {
   const date = Date.now();
   const results = await currentSpikeCoin(date);
   console.log(
