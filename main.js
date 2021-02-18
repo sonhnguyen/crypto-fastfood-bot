@@ -80,6 +80,7 @@ const currentSpikeCoin = async (occurAt) => {
           startTime: occurAt - 15 * 60 * 1000,
           endTime: occurAt,
           limit: 1000,
+          enableRateLimit: true,
         });
         symbolMap[s].candles = d.map((e) => ({
           openTimeString: new Date(e[0]),
@@ -383,7 +384,7 @@ router.post("/ready-msg", async (req, res) => {
 });
 
 app.listen(Number(process.env.PORT), async () => {
-  // const result = await currentSpikeCoin(Number(new Date(2021, 1, 16, 17, 56)));
+  // const result = await currentSpikeCoin(Number(new Date(2021, 1, 17, 20, 41)));
   // console.log(result[0].symbol);
 
   // console.log("current spike:", (await currentSpikeCoin(Date.now()))[0].symbol);
