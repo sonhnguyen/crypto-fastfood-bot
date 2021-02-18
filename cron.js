@@ -1,4 +1,6 @@
 const fs = require("fs");
+const cron = require("node-cron");
+
 var Decimal = require("decimal.js");
 require("dotenv").config();
 const Binance = require("node-binance-api");
@@ -17,16 +19,8 @@ const binanceAccountClients = binanceKeys.map((_, index) => {
   });
 });
 
-const express = require("express");
-const bodyParser = require("body-parser");
-const router = express.Router();
-const app = express();
-var cors = require("cors");
-
-app.use(cors());
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json());
-app.use(router);
+const minimumsJson = fs.readFileSync("minimums.json");
+const exchangeInfo = JSON.parse(minimumsJson);
 
 const SYMBOLS_MAP = {
   SOLUSDT: {},
@@ -66,9 +60,6 @@ const SYMBOLS_MAP = {
   BTSUSDT: {},
   SANDUSDT: {},
 };
-
-const minimumsJson = fs.readFileSync("minimums.json");
-const exchangeInfo = JSON.parse(minimumsJson);
 
 const currentSpikeCoin = async (occurAt) => {
   var symbolMap = { ...SYMBOLS_MAP };
@@ -270,35 +261,6 @@ const executeTrade = async (symbol, binanceClient) => {
     );
     console.info(stopOrder);
 
-    // const takeProfitPrice = new Decimal(entryPrice).mul(
-    //   1 + Number(process.env.TAKEPROFIT_PERCENT)
-    // );
-    // console.log(
-    //   await binanceClient.futuresSell(
-    //     `${symbol}`,
-    //     quantity.toString(),
-    //     takeProfitPrice.toFixed(currencyInfo.pricePrecision).toString(),
-    //     {
-    //       stopPrice: takeProfitPrice
-    //         .toFixed(currencyInfo.pricePrecision)
-    //         .toString(),
-    //       type: "TAKE_PROFIT",
-    //     }
-    //   )
-    // );
-    // console.log(
-    //   await binanceClient.futuresSell(
-    //     `${symbol}`,
-    //     quantity.toString(),
-    //     stoplossPrice.toFixed(currencyInfo.pricePrecision).toString(),
-    //     {
-    //       stopPrice: stoplossPrice
-    //         .toFixed(currencyInfo.pricePrecision)
-    //         .toString(),
-    //       type: "STOP",
-    //     }
-    //   )
-    // );
     console.log("entry:", entryPrice);
     console.log("stoploss:", stopPrice);
     console.log("takeProfit trailing activation price:", activationPrice);
@@ -327,72 +289,24 @@ const cancelAllOrdersAndPositions = async (binanceClient) => {
   return;
 };
 
-router.post("/future-order", async (req, res) => {
-  console.log("req.body.message", req.body.message);
-  let message;
-  if (req.body.message.toLowerCase().includes("are you ready")) {
-    const queryTopPossibles = await currentSpikeCoin(Date.now());
-    console.log(
-      "queryTopPossibles",
-      queryTopPossibles.map((e) => `${e.symbol} ${e.changePercent}%`)
-    );
-    message = {
-      symbol: queryTopPossibles[0].symbol,
-    };
-    console.log(
-      "process.env.IS_MULTIPLE_CLIENTS",
-      process.env.IS_MULTIPLE_CLIENTS
-    );
+cron.schedule("*/6 * * * *", async function () {
+  const date = Date.now();
+  const results = await currentSpikeCoin(date);
+  console.log(
+    date,
+    results[0].symbol,
+    results[1].symbol,
+    results[0].changePercent - results[1].changePercent
+  );
+  if (results[0].changePercent - results[1].changePercent > 0.5) {
     if (process.env.IS_MULTIPLE_CLIENTS == "true") {
+      console.log("executeTrade:", results[0].symbol, results[0].changePercent);
       for (const binanceClient of binanceAccountClients) {
-        await executeTrade(message.symbol, binanceClient);
+        await executeTrade(results[0].symbol, binanceClient);
       }
     } else {
-      await executeTrade(message.symbol, client);
+      await executeTrade(results[0].symbol, client);
     }
-  } else if (req.body.message.toLowerCase().includes("cancel all")) {
-    if (process.env.IS_MULTIPLE_CLIENTS == "true") {
-      for (const binanceClient of binanceAccountClients) {
-        await cancelAllOrdersAndPositions(binanceClient);
-      }
-    } else {
-      await cancelAllOrdersAndPositions(client);
-    }
-  } else if (req.body.message.toLowerCase().includes("buy / long:")) {
-    message = parseMesage(req.body.message);
-    console.log(
-      "process.env.IS_MULTIPLE_CLIENTS",
-      process.env.IS_MULTIPLE_CLIENTS
-    );
-    if (process.env.IS_MULTIPLE_CLIENTS == "true") {
-      for (const binanceClient of binanceAccountClients) {
-        await executeTrade(message.symbol, binanceClient);
-      }
-    } else {
-      await executeTrade(message.symbol, client);
-    }
-  } else {
-    console.log("unsupported command:", req.body.message);
-    res.end("no");
-    return;
   }
-
-  res.end("yes");
-});
-
-router.post("/ready-msg", async (req, res) => {
-  // var occurAt = Number(new Date(2021, 1, 16, 17, 56))
-  var occurAt = Date.now();
-  const result = await currentSpikeCoin(occurAt);
-  res.json(result.map((e) => `${e.symbol} ${e.changePercent}%`));
-});
-
-app.listen(Number(process.env.PORT), async () => {
-  // const result = await currentSpikeCoin(Number(new Date(2021, 1, 17, 20, 41)));
-  var result = await currentSpikeCoin(Date.now());
-  // console.log(result[0].symbol);
-
-  console.log("current spike:", result[0].symbol, result[0].changePercent);
-  console.log("current spike:", result[1].symbol, result[1].changePercent);
-  console.log(`Started on PORT ${Number(process.env.PORT)}`);
+  console.log("running a task every 10 minute");
 });
