@@ -294,7 +294,7 @@ const cancelAllOrdersAndPositions = async (binanceClient) => {
   return;
 };
 
-cron.schedule("*/10 * * * * *", async function () {
+cron.schedule(process.env.CRONJOB, async function () {
   const date = Date.now();
   const results = await currentSpikeCoin(date);
   console.log(
